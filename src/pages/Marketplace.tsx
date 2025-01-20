@@ -1,8 +1,33 @@
 import React, { useState } from 'react';
-import { Terminal, Plus, Coins, TrendingUp, Newspaper, BarChart2 } from 'lucide-react';
+import { Terminal, Plus, Coins, TrendingUp, Newspaper, BarChart2, AlertCircle } from 'lucide-react';
 
 const Polarity: React.FC = () => {
   const [activeTab, setActiveTab] = useState('terminal');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string>('');
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFileError('');
+
+    if (file) {
+      if (file.size > 200 * 1024) { // 200KB in bytes
+        setFileError('File size must be less than 200KB');
+        setSelectedFile(null);
+        e.target.value = ''; // Reset input
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        setFileError('File must be an image');
+        setSelectedFile(null);
+        e.target.value = ''; // Reset input
+        return;
+      }
+
+      setSelectedFile(file);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -43,20 +68,116 @@ const Polarity: React.FC = () => {
         return (
           <div className="bg-white p-6 rounded-lg">
             <h3 className="text-xl font-bold mb-4">Create New Token</h3>
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Token Name</label>
-                <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            <form className="space-y-6">
+              {/* Basic Token Information */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800">Basic Information</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Token Name</label>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Symbol</label>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Total Supply</label>
+                  <input
+                    type="number"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Symbol</label>
-                <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+
+              {/* Token Image Upload */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800">Token Image</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Upload Token Image (Max 200KB)</label>
+                  <div className="mt-1 flex items-center space-x-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-indigo-50 file:text-indigo-700
+                        hover:file:bg-indigo-100"
+                    />
+                    {selectedFile && (
+                      <div className="flex items-center text-sm text-green-600">
+                        <span>✓ File selected</span>
+                      </div>
+                    )}
+                  </div>
+                  {fileError && (
+                    <div className="mt-2 flex items-center text-sm text-red-600">
+                      <AlertCircle className="w-4 h-4 mr-1" />
+                      <span>{fileError}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Total Supply</label>
-                <input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+
+              {/* Social Links */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800">Social Media & Website</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Project Website</label>
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      https://
+                    </span>
+                    <input
+                      type="text"
+                      className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="www.example.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Twitter</label>
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="twitter_handle"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Telegram</label>
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      t.me/
+                    </span>
+                    <input
+                      type="text"
+                      className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="telegram_group"
+                    />
+                  </div>
+                </div>
               </div>
-              <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
                 Create Token
               </button>
             </form>
